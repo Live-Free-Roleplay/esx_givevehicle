@@ -4,8 +4,10 @@ game 'gta5'
 
 lua54 'yes'
 
+shared_script '@es_extended/imports.lua'
+
 server_scripts {
-	'@mysql-async/lib/MySQL.lua',
+	'@oxmysql/lib/MySQL.lua'
 	'@es_extended/locale.lua',
 	'server/main.lua',
 	'config.lua',
@@ -24,6 +26,5 @@ client_scripts {
 }
 
 dependency {
-	'es_extended',
-	'esx_vehicleshop'
+	'es_extended'
 }
