@@ -24,7 +24,7 @@ function givevehicle(_source, _args, vehicleType)
   local isAdmin = false
   if IsPlayerAceAllowed(_source, "giveownedcar.command") then isAdmin = true end
 
-  if isAdmin then
+	if isAdmin then
     if _args[1] == nil or _args[2] == nil then
       TriggerClientEvent('esx:showNotification', _source, '~r~/givevehicle playerID carModel [plate]')
     elseif _args[3] ~= nil then
@@ -171,4 +171,33 @@ end)
 RegisterServerEvent('esx_giveownedcar:printToConsole')
 AddEventHandler('esx_giveownedcar:printToConsole', function(msg)
 	print(msg)
+end)
+
+RegisterServerEvent('esx_giveownedcar:genPlate')
+AddEventHandler('esx_giveownedcar:genPlate', function (playerID, vehicle, vehicleType, playerName, model, type)
+	local src = source
+	local chars = {}
+	for i = 65, 90 do
+			table.insert(chars, string.char(i))
+	end
+	for i = 48, 57 do
+			table.insert(chars, string.char(i))
+	end
+	math.randomseed(os.time())
+	local plate_number = {}
+	for i = 1, 8 do
+			table.insert(plate_number, chars[math.random(1, #chars)])
+	end
+
+	TriggerClientEvent('esx_giveownedcar:genPlateRet', src, table.concat(plate_number), playerID, vehicle, vehicleType, playerName, model, type)
+end)
+
+RegisterServerEvent('esx_giveownedcar:checkOwned')
+AddEventHandler('esx_giveownedcar:checkOwned', function (model, coords, vehicle, playerID, vehicleType, plate, model, playerName, type, carExist)
+	local src = source
+	MySQL.query('SELECT `plate` FROM `owned_vehicles` WHERE `plate` = ?', {
+    plate
+	}, function(response)
+		TriggerClientEvent('esx_giveownedcar:checkOwnedRet', src, #response, model, coords, vehicle, playerID, vehicleType, plate, model, playerName, type, carExist)
+	end)
 end)

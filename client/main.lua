@@ -33,24 +33,12 @@ AddEventHandler('esx_giveownedcar:spawnVehicle', function(playerID, model, playe
 	local playerPed = GetPlayerPed(-1)
 	local coords    = GetEntityCoords(playerPed)
 	local carExist  = false
-
 	ESX.Game.SpawnVehicle(model, coords, 0.0, function(vehicle) --get vehicle info
 		if DoesEntityExist(vehicle) then
 			carExist = true
 			SetEntityVisible(vehicle, false, false)
 			SetEntityCollision(vehicle, false)
-			
-			local newPlate     = exports.esx_vehicleshop:GeneratePlate()
-			local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
-			vehicleProps.plate = newPlate
-			TriggerServerEvent('esx_giveownedcar:setVehicle', vehicleProps, playerID, vehicleType)
-			ESX.Game.DeleteVehicle(vehicle)
-			if type ~= 'console' then
-				ESX.ShowNotification(_U('gived_car', model, newPlate, playerName))
-			else
-				local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
-				TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
-			end				
+			TriggerServerEvent('esx_giveownedcar:genPlate', playerID, vehicle, vehicleType, playerName, model, type)
 		end		
 	end)
 	
@@ -64,6 +52,20 @@ AddEventHandler('esx_giveownedcar:spawnVehicle', function(playerID, model, playe
 	end
 end)
 
+RegisterNetEvent('esx_giveownedcar:genPlateRet')
+AddEventHandler('esx_giveownedcar:genPlateRet', function(newPlate, playerID, vehicle, vehicleType, playerName, model, type)
+	local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
+	vehicleProps.plate = newPlate
+	TriggerServerEvent('esx_giveownedcar:setVehicle', vehicleProps, playerID, vehicleType)
+	ESX.Game.DeleteVehicle(vehicle)
+	if type ~= 'console' then
+		ESX.ShowNotification(_U('gived_car', model, newPlate, playerName))
+	else
+		local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
+		TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
+	end	
+end)
+
 RegisterNetEvent('esx_giveownedcar:spawnVehiclePlate')
 AddEventHandler('esx_giveownedcar:spawnVehiclePlate', function(playerID, model, plate, playerName, type, vehicleType)
 	local playerPed = GetPlayerPed(-1)
@@ -71,39 +73,44 @@ AddEventHandler('esx_giveownedcar:spawnVehiclePlate', function(playerID, model, 
 	local generatedPlate = string.upper(plate)
 	local carExist  = false
 
-	ESX.TriggerServerCallback('esx_vehicleshop:isPlateTaken', function (isPlateTaken)
-		if not isPlateTaken then
-			ESX.Game.SpawnVehicle(model, coords, 0.0, function(vehicle) --get vehicle info	
-				if DoesEntityExist(vehicle) then
-					carExist = true
-					SetEntityVisible(vehicle, false, false)
-					SetEntityCollision(vehicle, false)	
-					
-					local newPlate     = string.upper(plate)
-					local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
-					vehicleProps.plate = newPlate
-					TriggerServerEvent('esx_giveownedcar:setVehicle', vehicleProps, playerID, vehicleType)
-					ESX.Game.DeleteVehicle(vehicle)
-					if type ~= 'console' then
-						ESX.ShowNotification(_U('gived_car',  model, newPlate, playerName))
-					else
-						local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
-						TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
-					end				
-				end
-			end)
+	TriggerServerEvent('esx_giveownedcar:checkOwned', model, coords, vehicle, playerID, vehicleType, plate, model, playerName, type, carExist)
+end)
+
+RegisterNetEvent('esx_giveownedcar:checkOwnedRet')
+AddEventHandler('esx_giveownedcar:checkOwnedRet', function(response, model, coords, vehicle, playerID, vehicleType, plate, model, playerName, type, carExist)
+	print(response)
+	if response == 0 then
+		ESX.Game.SpawnVehicle(model, coords, 0.0, function(vehicle) --get vehicle info	
+			if DoesEntityExist(vehicle) then
+				carExist = true
+				SetEntityVisible(vehicle, false, false)
+				SetEntityCollision(vehicle, false)	
+				
+				local newPlate     = string.upper(plate)
+				local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
+				vehicleProps.plate = newPlate
+				TriggerServerEvent('esx_giveownedcar:setVehicle', vehicleProps, playerID, vehicleType)
+				ESX.Game.DeleteVehicle(vehicle)
+				if type ~= 'console' then
+					ESX.ShowNotification(_U('gived_car',  model, newPlate, playerName))
+				else
+					local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
+					TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
+				end				
+			end
+		end)
+	else
+		carExist = true
+		if type ~= 'console' then
+			ESX.ShowNotification(_U('plate_already_have'))
 		else
-			carExist = true
-			if type ~= 'console' then
-				ESX.ShowNotification(_U('plate_already_have'))
-			else
-				local msg = ('ERROR: this plate is already been used on another vehicle')
-				TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
-			end					
-		end
-	end, generatedPlate)
-	
+			local msg = ('Error: this plate is already been used on another vehicle')
+			TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
+		end					
+	end
+
 	Wait(2000)
+
 	if not carExist then
 		if type ~= 'console' then
 			ESX.ShowNotification(_U('unknown_car', model))

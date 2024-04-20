@@ -7,24 +7,21 @@ description 'Admins can give cars to players'
 lua54 'yes'
 
 shared_scripts {
-	'@es_extended/imports.lua'
+	'@es_extended/imports.lua',
+	'@es_extended/locale.lua',
+	'config.lua',
+	'locales/de.lua',
+	'locales/tw.lua',
+	'locales/en.lua'
 }
 
 server_scripts {
 	'@oxmysql/lib/MySQL.lua',
-	'server/main.lua',
-	'config.lua',
-	'locales/de.lua',
-	'locales/tw.lua',
-	'locales/en.lua'
+	'server/main.lua'
 }
 
 client_scripts {
-	'client/main.lua',
-	'config.lua',
-	'locales/de.lua',
-	'locales/tw.lua',
-	'locales/en.lua'
+	'client/main.lua'
 }
 
 dependency 'es_extended'
