@@ -1,6 +1,8 @@
-resource_manifest_version '44febabe-d386-4d18-afbe-5e627f4af937'
+fx_version 'adamant'
 
-description 'made by MEENO'
+game 'gta5'
+
+lua54 'yes'
 
 server_scripts {
 	'@mysql-async/lib/MySQL.lua',

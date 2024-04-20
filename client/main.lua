@@ -13,7 +13,7 @@ TriggerEvent('chat:addSuggestion', '/givecar', 'Give a car to player', {
     { name="<plate>", help="Vehicle plate, skip if you want random generate plate number" }
 })
 
-TriggerEvent('chat:addSuggestion', '/giveplane', 'Give an airplane to player', {
+--[[TriggerEvent('chat:addSuggestion', '/giveplane', 'Give an airplane to player', {
 	{ name="id", help="The ID of the player" },
     { name="vehicle", help="Vehicle model" },
     { name="<plate>", help="Vehicle plate, skip if you want random generate plate number" }
@@ -29,7 +29,7 @@ TriggerEvent('chat:addSuggestion', '/giveheli', 'Give a helicopter to player', {
 	{ name="id", help="The ID of the player" },
     { name="vehicle", help="Vehicle model" },
     { name="<plate>", help="Vehicle plate, skip if you want random generate plate number" }
-})
+})--]]
 
 TriggerEvent('chat:addSuggestion', '/delcarplate', 'Delete a owned vehicle by plate number', {
 	{ name="plate", help="Vehicle's plate number" }
@@ -51,7 +51,7 @@ AddEventHandler('esx_giveownedcar:spawnVehicle', function(playerID, model, playe
 			local vehicleProps = ESX.Game.GetVehicleProperties(vehicle)
 			vehicleProps.plate = newPlate
 			TriggerServerEvent('esx_giveownedcar:setVehicle', vehicleProps, playerID, vehicleType)
-			ESX.Game.DeleteVehicle(vehicle)	
+			ESX.Game.DeleteVehicle(vehicle)
 			if type ~= 'console' then
 				ESX.ShowNotification(_U('gived_car', model, newPlate, playerName))
 			else
