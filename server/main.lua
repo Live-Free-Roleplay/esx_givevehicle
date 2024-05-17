@@ -20,6 +20,40 @@ RegisterCommand('giveheli', function(source, args)
 	givevehicle(source, args, 'helicopter')
 end)
 
+RegisterServerEvent('esx_giveownedcar:logGiveCar')
+AddEventHandler('esx_giveownedcar:logGiveCar', function (model, newPlate, playerID)
+	local src = source
+	local xAdmin = ESX.GetPlayerFromId(src)
+	local xPlayer = ESX.GetPlayerFromId(playerID)
+
+	local data = {
+		{
+			title = 'Vehicle Granted',
+			description = ('Admin **%s** (%s, %s) **granted** vehicle **%s** with plate **%s** to player **%s** (%s, %s).')
+				:format(
+					xAdmin.getName(),
+					xAdmin.getIdentifier(),
+					src,
+					model,
+					newPlate,
+					xPlayer.getName(),
+					xPlayer.getIdentifier(),
+					playerID
+				),
+			color = 0x00ff00
+		}
+	}
+
+	PerformHttpRequest(
+			"https://discord.com/api/webhooks/1240860709953474560/dEnXaFLa8ZFrvm394HLsKEpm7cGCTc8oupHtozoeiH0iNByE1vBIAST99IGeFEHReu-R",
+			function(err, text, headers)
+			end,
+			'POST',
+			json.encode({ embeds = data }),
+			{ ['Content-Type'] = 'application/json' }
+	)
+end)
+
 function givevehicle(_source, _args, vehicleType)
   local isAdmin = false
   if IsPlayerAceAllowed(_source, "giveownedcar.command") then isAdmin = true end

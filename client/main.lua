@@ -60,6 +60,7 @@ AddEventHandler('esx_giveownedcar:genPlateRet', function(newPlate, playerID, veh
 	ESX.Game.DeleteVehicle(vehicle)
 	if type ~= 'console' then
 		ESX.ShowNotification(_U('gived_car', model, newPlate, playerName))
+		TriggerServerEvent('esx_giveownedcar:logGiveCar', model, newPlate, playerID)
 	else
 		local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
 		TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
@@ -93,6 +94,7 @@ AddEventHandler('esx_giveownedcar:checkOwnedRet', function(response, model, coor
 				ESX.Game.DeleteVehicle(vehicle)
 				if type ~= 'console' then
 					ESX.ShowNotification(_U('gived_car',  model, newPlate, playerName))
+					TriggerServerEvent('esx_giveownedcar:logGiveCar', model, newPlate, playerID)
 				else
 					local msg = ('addCar: ' ..model.. ', plate: ' ..newPlate.. ', toPlayer: ' ..playerName)
 					TriggerServerEvent('esx_giveownedcar:printToConsole', msg)
